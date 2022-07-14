@@ -1,4 +1,6 @@
 library(tidyverse)
+library(tibble)
+options(pillar.sigfig = 10)
 library(readxl)
 library(stargazer)
 library(xtable)
@@ -18,9 +20,9 @@ df <- df %>%
   df$fin <- replace(df$fin, df$gfa/df$cfa >= 2/3, 2)
     # fin=2: financiamento governamental de 67% dos tratamentos (beveridge)
   df$fin <- replace(df$fin,  df$chi/df$cfa >= 2/3, 3)
-    # fin=3: financiamento privado compulsÛrio de 67% dos tratamentos (bismarck)
+    # fin=3: financiamento privado compuls√≥rio de 67% dos tratamentos (bismarck)
   df$fin <- replace(df$fin, df$oop > 67, 1)
-    # fin=1: oop >= 1.5(mÈdia_internacional), pgtos privados pelo paciente
+    # fin=1: oop >= 1.5(m√©dia_internacional), pgtos privados pelo paciente
   df$fin <- replace(df$fin, is.na(df$fin), 4)
     # fin=4: financiamento misto, nem segurado "bismark" nem SUS "beveridge"
   df$fin <- as.factor(df$fin)
@@ -56,25 +58,33 @@ df <- df %>%
   df <- rename(df, pib = gdp)
   df <- rename(df, pib_ppp = gdp_ppp)
   df <- rename(df, che_pib = che_gdp)
-  #ssdf: sistema de sa˙de deficiente ou falido
+  #ssdf: sistema de sa√∫de deficiente ou falido
 View(df)
 
 
 #  VISUALIZACAO DE DADOS, ANALISE DESCRITIVA
 summary(df$fin)
 df %>% group_by(fin) %>% summarise(mean(exp, na.rm = TRUE),
-                                   sd(exp, na.rm = TRUE),
                                    mean(mor, na.rm = TRUE),
-                                   sd(mor, na.rm = TRUE))
-df %>% summarise(mean(exp, na.rm = TRUE), sd(exp, na.rm = TRUE),
-                 mean(mor, na.rm = TRUE), sd(mor, na.rm = TRUE))
-
-df %>% group_by(fin) %>% summarise(mean(pib, na.rm = TRUE),
-                                   sd(pib, na.rm = TRUE),
+                                   mean(pib, na.rm = TRUE),
                                    mean(che_pib, na.rm = TRUE),
-                                   sd(che_pib, na.rm = TRUE))
-df %>% summarise(mean(pib, na.rm = TRUE), sd(pib, na.rm = TRUE),
-                 mean(che_pib, na.rm = TRUE), sd(che_pib, na.rm = TRUE))
+                                   mean(idh, na.rm = TRUE))
+df %>% summarise(mean(exp, na.rm = TRUE),
+                 mean(mor, na.rm = TRUE),
+                 mean(pib, na.rm = TRUE),
+                 mean(che_pib, na.rm = TRUE),
+                 mean(idh, na.rm = TRUE))
+df %>% group_by(fin) %>% summarise(sd(exp, na.rm = TRUE),
+                                   sd(mor, na.rm = TRUE),
+                                   sd(pib, na.rm = TRUE),
+                                   sd(che_pib, na.rm = TRUE),
+                                   sd(idh, na.rm = TRUE))
+df %>% summarise(sd(exp, na.rm = TRUE),
+                 sd(mor, na.rm = TRUE),
+                 sd(pib, na.rm = TRUE),
+                 sd(che_pib, na.rm = TRUE),
+                 sd(idh, na.rm = TRUE))
+
 summary(df_mis$fin)
 summary(df_pob$fin)
 summary(df_med$fin)
@@ -132,7 +142,7 @@ vif(exp2)
 vif(exp3)
 vif(exp4)
 
-#  TABELAS DE REGRESS√O
+#  TABELAS DE REGRESS√ÉO
 
 stargazer(exp1, exp2, exp3, exp4, type = "text",
           se=list(se_e1, se_e2, se_e3, se_e4))
